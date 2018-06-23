@@ -6,7 +6,9 @@ A Hapi plugin for managing incoming subscription updates from fastspring
 
 ### Compatibility
 
-* sub-unsub works with hapi 16 
+* sub-unsub will eventually work with hapi 16 
+* this software is UNTESTED 
+* you really shouldn't be using this yet...
 
 ### Installation
 
