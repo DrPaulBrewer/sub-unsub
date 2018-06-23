@@ -1,0 +1,35 @@
+{
+  "name": "sub-unsub",
+  "version": "0.1.0",
+  "description": "Hapi plugin for providing Fastspring subscription endpoint processing and maintaining subscription state in pouchDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hapi",
+    "hapijs",
+    "fastspring-subscription-management",
+    "PouchDB"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://source.developers.google.com/p/economics-lab-software/r/sub-unsub"
+  },
+  "author": "drpaulbrewer@eaftc.com",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8"
+  },
+  "peerDependencies": {
+    "hapi": ">=16.0.0 <17"
+  },
+  "dependencies": {
+    "boom": "^6.0.0",
+    "iron": "^5.0.4",
+    "joi": "^13.4.0",
+    "p-filter": "^1.0.0",
+    "pouchdb-node": "^6.4.3",
+    "pouchdb-upsert": "^2.2.0"
+  }
+}
