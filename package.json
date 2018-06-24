@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "boom": "^6.0.0",
-    "iron": "^5.0.4",
     "joi": "^13.4.0",
     "p-filter": "^1.0.0",
     "pouchdb-node": "^6.4.3",
