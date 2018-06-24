@@ -26,50 +26,25 @@ function subUnsub(server, options, next) {
   }
 
 
-  function hexidFor(email){
+  function hexidFor(email) {
     const secret = options.hexidSecret;
     const standardizedEmail = email.toLowerCase().trim();
     return (
       crypto
-      .createHmac('sha256',secret)
+      .createHmac('sha256', secret)
       .update(standardizedEmail, 'utf8')
       .digest('hex')
     );
   }
 
-  const fastSpringDateFields = [
-    'changed',
-    'next',
-    'end',
-    'canceledDate',
-    'deactivationDate',
-    'begin',
-    'nextChargeDate',
-    'nextNotificationDate'
-  ];
-
-  const fastSpringStringFields = [
-    'id',
-    'state',
-    'sku',
-    'display'
-  ];
-
-  const fastSpringBoolFields = [
-    'active',
-    'live',
-    'adhoc',
-    'autoRenew'
-  ];
-
   const schema = {};
-  fastSpringDateFields.forEach((k)=>{
+  options.fields.date.forEach((k) => {
     schema[k] = Joi.date().timestamp('javascript');
   });
-  fastSpringStringFields.forEach((k)=>{
+  options.fields.string.forEach((k) => {
     schema[k] = Joi.string();
   });
-  fastSpringBoolFields.forEach((k)=>{
+  options.fields.boolean.forEach((k) => {
     schema[k] = Joi.boolean();
   });
 
@@ -82,40 +57,36 @@ function subUnsub(server, options, next) {
       quantity: Joi.number().integer()
     })
   );
-  
+
   const joiOptions = {
     allowUnknown: true,
     skipFunctions: true,
     stripUnknown: true
   };
-  
-  const handledEventTypes = [
-    'subscription.activated',
-    'subscription.deactivated',
-    'subscription.updated',
-    'subscription.charge.completed',
-    'subscription.charge.failed'
-  ];
 
-  async function task(eventType, data){
+  async function task(eventType, data) {
     try {
       const email = data.account.contact.email;
       const hexid = hexidFor(email);
       const save = await Joi.validate(data, schema, joiOptions);
-      save.fsid = save.id;
-      delete save.id;
-      save.eventType = eventType;
-      save.eventReceived = Date.now();
-      save._id = hexid; // eslint-disable-line no-underscore-dangle
-      if (handledEventTypes.includes(eventType)){
-        const result = await db.upsert(hexid, (indata)=>(Object.assign({},indata,save)));
-        return result.updated;
+      if (save) {
+        if (save.id) {
+          save.fsid = save.id;
+          delete save.id;
+        }
+        save.eventType = eventType;
+        save.eventReceived = Date.now();
+        save._id = hexid; // eslint-disable-line no-underscore-dangle
+        if (options.handledEventTypes.includes(eventType)) {
+          const result = await db.upsert(hexid, (indata) => (Object.assign({}, indata, save)));
+          return result.updated;
+        }
       }
-      return false;
-    } catch(e){
+    } catch (e) {
       console.log(`error processing Fastspring event ${eventType}, event unprocessed`); // eslint-disable-line no-console
-      return false;
+      console.log(e); // eslint-disable-line no-console
     }
+    return false;
   }
 
   server.route([{
@@ -131,8 +102,7 @@ function subUnsub(server, options, next) {
       return (
         pFilter(
           req.body.events,
-          (event) => (task(event.type, event.data)),
-          { concurrency: 1 }
+          (event) => (task(event.type, event.data)), { concurrency: 1 }
         )
         .then((events) => (events.map((event) => (event.id))))
         .then((ids) => (reply(ids.join("\n"))))
