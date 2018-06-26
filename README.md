@@ -26,8 +26,7 @@ A Hapi plugin for managing incoming subscription updates from fastspring
         "subscription.activated",
         "subscription.deactivated",
         "subscription.updated",
-        "subscription.charge.completed",
-        "subscription.charge.failed"
+        "subscription.cancelled"
       ],
       "fields": {
         "date": [

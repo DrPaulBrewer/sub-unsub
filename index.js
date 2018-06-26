@@ -68,6 +68,11 @@ function subUnsub(server, options, next) {
     try {
       const email = data.account.contact.email;
       const hexid = hexidFor(email);
+      // flatten data object to include any subscription fields
+      if (typeof(data.subscription)==='object'){
+        Object.assign(data, data.subscription);
+        delete data.subscription;
+      }
       const save = await Joi.validate(data, schema, joiOptions);
       if (save) {
         if (save.id) {
@@ -78,8 +83,13 @@ function subUnsub(server, options, next) {
         save.eventReceived = Date.now();
         save._id = hexid; // eslint-disable-line no-underscore-dangle
         if (options.handledEventTypes.includes(eventType)) {
-          const result = await db.upsert(hexid, (indata) => (Object.assign({}, indata, save)));
-          return result.updated;
+          if (save.live){
+            const result = await db.upsert(hexid, (indata) => (Object.assign({}, indata, save)));
+            return result.updated;
+          }
+          console.log(new Date().toUTCString()+" received test event:"); // eslint-disable-line no-console
+          console.log(JSON.stringify(save,null,2)); // eslint-disable-line no-console
+          return true;
         }
       }
     } catch (e) {
