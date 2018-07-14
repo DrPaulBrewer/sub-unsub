@@ -105,7 +105,7 @@ function subUnsub(server, options, next) {
         const email = info.user.emailAddress;
         const hexid = hexidFor(email);
         const sub = await db.get(hexid, { latest: true });
-        req.subscription = sub;
+        req.sub = sub;
       } catch (e) {
         console.log("Error in getGoogleDriveAssociatedSubscription: " + e.toString()); // eslint-disable-line no-console
       }
