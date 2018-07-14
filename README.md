@@ -62,6 +62,7 @@ A Hapi plugin for managing incoming subscription updates from fastspring
 * provides the backend webhook for Fastspring
 * update a pouchDB/couchDB database from the Fastspring subscription updates  
 * anonymizes emails to hexids using a security string
+* provides `req.sub` on all requests containing most recent subscription update for Google Sign In user
 
 ## Copyright
 
