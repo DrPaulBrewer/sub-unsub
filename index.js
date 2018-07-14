@@ -25,7 +25,6 @@ function subUnsub(server, options, next) {
     return (reqSignature === bodySignature);
   }
 
-
   function hexidFor(email) {
     const secret = options.hexidSecret;
     const standardizedEmail = email.toLowerCase().trim();
@@ -69,7 +68,7 @@ function subUnsub(server, options, next) {
       const email = data.account.contact.email;
       const hexid = hexidFor(email);
       // flatten data object to include any subscription fields
-      if (typeof(data.subscription)==='object'){
+      if (typeof(data.subscription) === 'object') {
         Object.assign(data, data.subscription);
         delete data.subscription;
       }
@@ -83,12 +82,12 @@ function subUnsub(server, options, next) {
         save.eventReceived = Date.now();
         save._id = hexid; // eslint-disable-line no-underscore-dangle
         if (options.handledEventTypes.includes(eventType)) {
-          if (save.live){
+          if (save.live) {
             const result = await db.upsert(hexid, (indata) => (Object.assign({}, indata, save)));
             return result.updated;
           }
-          console.log(new Date().toUTCString()+" received test event:"); // eslint-disable-line no-console
-          console.log(JSON.stringify(save,null,2)); // eslint-disable-line no-console
+          console.log(new Date().toUTCString() + " received test event:"); // eslint-disable-line no-console
+          console.log(JSON.stringify(save, null, 2)); // eslint-disable-line no-console
           return true;
         }
       }
@@ -98,6 +97,26 @@ function subUnsub(server, options, next) {
     }
     return false;
   }
+
+  async function getGoogleDriveAssociatedSubscription(req, reply) {
+    if (req.drive) {
+      try {
+        const info = await req.drive.x.aboutMe();
+        const email = info.user.emailAddress;
+        const hexid = hexidFor(email);
+        const sub = await db.get(hexid, { latest: true });
+        req.subscription = sub;
+      } catch (e) {
+        console.log("Error in getGoogleDriveAssociatedSubscription: " + e.toString()); // eslint-disable-line no-console
+      }
+    }
+    reply.continue();
+  }
+
+  server.ext([{
+    type: 'onPreAuth',
+    method: getGoogleDriveAssociatedSubscription
+  }]);
 
   server.route([{
     path: options.webhookPath,
