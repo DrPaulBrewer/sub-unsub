@@ -7,6 +7,16 @@ const PouchDB = require('pouchdb-node');
 const Joi = require('joi');
 PouchDB.plugin(require('pouchdb-upsert'));
 
+function removeEmpty(obj){
+  // recusively remove null properties from obj and nested objects
+  // See Rotareti's answer on Stack Overflow
+  // https://stackoverflow.com/a/38340730/103081
+  Object.entries(obj).forEach(([key, val]) => {
+    if (val && typeof val === 'object') removeEmpty(val);
+    else if (val === null) delete obj[key];
+  });
+}
+
 function subUnsub(server, options, next) {
   if (!options.hexidSecret) throw Boom.badImplementation("options.hexidSecret missing in sub-unsub configuration");
   if (!options.signatureSecret) throw Boom.badImplementation("options.signatureSecret missing in sub-unsub configuration");
@@ -41,21 +51,21 @@ function subUnsub(server, options, next) {
 
   const schema = {};
   options.fields.date.forEach((k) => {
-    schema[k] = Joi.date().timestamp('javascript');
+    schema[k] = Joi.date().timestamp('javascript').optional(); // eslint-disable-line newline-per-chained-call
   });
   options.fields.string.forEach((k) => {
-    schema[k] = Joi.string();
+    schema[k] = Joi.string().optional();
   });
   options.fields.boolean.forEach((k) => {
-    schema[k] = Joi.boolean();
+    schema[k] = Joi.boolean().optional();
   });
 
   // in .addons[i]
 
   schema.addons = Joi.array().items(
     Joi.object().keys({
-      sku: Joi.string(),
-      display: Joi.string(),
+      sku: Joi.string().optional(),
+      display: Joi.string().optional(),
       quantity: Joi.number().integer()
     })
   );
@@ -141,6 +151,7 @@ function subUnsub(server, options, next) {
         console.log("JSON.parse failed: "+e);
         return reply(Boom.badRequest("invalid JSON"));
       }
+      removeEmpty(req.payload);
       if (!Array.isArray(req.payload.events)) {
         console.log("missing events");
         return reply(Boom.badRequest("missing events"));
