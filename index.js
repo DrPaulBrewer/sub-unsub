@@ -78,6 +78,7 @@ function subUnsub(server, options, next) {
 
   async function task(eventType, data) {
     try {
+      // TODO: If data.account is a string, ask fastspring api for email and await response
       const email = data.account.contact.email;
       const hexid = hexidFor(email);
       // flatten data object to include any subscription fields

@@ -1,14 +1,14 @@
 # sub-unsub
 
-A Hapi plugin for managing incoming subscription updates from fastspring
+A Hapi plugin for sites with paid user subscriptions via fastspring
 
 ## Usage
 
 ### Compatibility
 
 * sub-unsub will eventually work with hapi 16
-* this software is UNTESTED
-* you really shouldn"t be using this yet...
+* this software simply doesn't work yet (Oct. 2018) and needs reorganization
+* so you really shouldn"t be using this yet...
 
 ### Installation
 
