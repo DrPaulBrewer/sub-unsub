@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 
+const crypto = require('crypto');
 const pFilter = require('p-filter');
 const Boom = require('boom');
 const PouchDB = require('pouchdb-node');
