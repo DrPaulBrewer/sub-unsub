@@ -151,7 +151,7 @@ function subUnsub(server, options, next) {
           (event) => (task(event.type, event.data)), { concurrency: 1 }
         )
         .then((events) => (events.map((event) => (event.id))))
-        .then((ids) => (reply.json(ids)))
+        .then((ids) => (reply(ids)))
         .catch((e)=>(console.log("Error processing "+options.webhookPath+" :"+e))) // eslint-disable-line no-console
       );
     }
