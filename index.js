@@ -20,7 +20,7 @@ function subUnsub(server, options, next) {
     const bodySignature = (
       crypto
       .createHmac('sha256', secret)
-      .update(req.body)
+      .update(req.payload)
       .digest()
       .toString('base64')
     );
@@ -128,13 +128,13 @@ function subUnsub(server, options, next) {
         console.log("invalid signature");
         return reply(Boom.badRequest("invalid signature"));
       }
-      if (!Array.isArray(req.body.events)) {
+      if (!Array.isArray(req.payload.events)) {
         console.log("missing events");
         return reply(Boom.badRequest("missing events"));
       }
       return (
         pFilter(
-          req.body.events,
+          req.payload.events,
           (event) => (task(event.type, event.data)), { concurrency: 1 }
         )
         .then((events) => (events.map((event) => (event.id))))
