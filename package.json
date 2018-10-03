@@ -1,6 +1,6 @@
 {
   "name": "sub-unsub",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Hapi plugin for providing Fastspring subscription endpoint processing and maintaining subscription state in pouchDB",
   "main": "index.js",
   "scripts": {
