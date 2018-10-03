@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const pFilter = require('p-filter');
 const Boom = require('boom');
 const PouchDB = require('pouchdb-node');
@@ -123,9 +125,11 @@ function subUnsub(server, options, next) {
     method: 'POST',
     handler(req, reply) {
       if (!hasValidSignature(req)) {
+        console.log("invalid signature");
         return reply(Boom.badRequest("invalid signature"));
       }
       if (!Array.isArray(req.body.events)) {
+        console.log("missing events");
         return reply(Boom.badRequest("missing events"));
       }
       return (
@@ -135,6 +139,7 @@ function subUnsub(server, options, next) {
         )
         .then((events) => (events.map((event) => (event.id))))
         .then((ids) => (reply(ids.join("\n"))))
+        .catch((e)=>(console.log("Error processing "+options.webhookPath+" :"+e))) // eslint-disable-line no-console
       );
     }
   }]);
