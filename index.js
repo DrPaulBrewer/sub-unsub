@@ -124,10 +124,22 @@ function subUnsub(server, options, next) {
   server.route([{
     path: options.webhookPath,
     method: 'POST',
+    config: {
+        payload: {
+            output: 'data',
+            parse: false
+        }
+    },
     handler(req, reply) {
       if (!hasValidSignature(req)) {
         console.log("invalid signature");
         return reply(Boom.badRequest("invalid signature"));
+      }
+      try {
+        req.payload = JSON.parse(req.payload);
+      } catch(e){
+        console.log("JSON.parse failed: "+e);
+        return reply(Boom.badRequest("invalid JSON"));
       }
       if (!Array.isArray(req.payload.events)) {
         console.log("missing events");
@@ -139,7 +151,7 @@ function subUnsub(server, options, next) {
           (event) => (task(event.type, event.data)), { concurrency: 1 }
         )
         .then((events) => (events.map((event) => (event.id))))
-        .then((ids) => (reply(ids.join("\n"))))
+        .then((ids) => (reply.json(ids)))
         .catch((e)=>(console.log("Error processing "+options.webhookPath+" :"+e))) // eslint-disable-line no-console
       );
     }
