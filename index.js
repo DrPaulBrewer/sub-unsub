@@ -49,7 +49,7 @@ function subUnsub(server, options, next) {
           req.fastspring.error = e.toString();
       }
     } else {
-      req.fastspring.error = new Error("not signed in");
+	req.fastspring.error = new Error("not signed in").toString();
     }
     reply.continue();
   }
