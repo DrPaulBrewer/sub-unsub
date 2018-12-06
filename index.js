@@ -17,7 +17,11 @@ function subUnsub(server, options, next) {
         if ((!email) || !(email.length)) throw new Error("no email");
         if (email.indexOf('@')<0) throw new Error("email missing @ symbol");
         if ((email.startsWith('@')) || (email.endsWith('@'))) throw new Error("invalid email: "+email);
-        const fsAccounts = await axios.get(options.fsurl+"accounts", {email});
+        const fsAccounts = await(
+          axios
+          .get(options.fsurl+"accounts", {params: {email}})
+          .then((r)=>(r.data))
+        );
         if (fsAccounts.result !== "success") throw new Error("no fastspring account");
         if ((!fsAccounts.accounts) || (!fsAccounts.accounts.length)) throw new Error("missing fastspring account");
         if (fsAccounts.accounts.length > 1) throw new Error("multiple fastspring accounts");
@@ -30,6 +34,7 @@ function subUnsub(server, options, next) {
             (id)=>(
               axios
                 .get(options.fsurl+"subscriptions/"+id)
+                .then((response)=>(response.data))
                 .then((sub)=>{
                   if (
                     (sub.active) &&
