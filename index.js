@@ -46,7 +46,7 @@ function subUnsub(server, options, next) {
             );
           }
       } catch (e) {
-        req.fastspring.error = e;
+          req.fastspring.error = e.toString();
       }
     } else {
       req.fastspring.error = new Error("not signed in");
