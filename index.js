@@ -13,7 +13,7 @@ function subUnsub(server, options, next) {
     if (req.drive) {
       try {
         const info = await req.drive.x.aboutMe();
-        const email = info.user.emailAddress;
+        const email = info.user.emailAddress.toLowerCase().trim();
         if ((!email) || !(email.length)) throw new Error("no email");
         if (email.indexOf('@')<0) throw new Error("email missing @ symbol");
         if ((email.startsWith('@')) || (email.endsWith('@'))) throw new Error("invalid email: "+email);
