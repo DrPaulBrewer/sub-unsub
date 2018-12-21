@@ -36,6 +36,9 @@ function subUnsub(server, options, next) {
     products
   }){
     const result = {};
+    if (limit && fsAccount && fsAccount.subscriptions && (fsAccount.subscriptions.length>limit)){
+      console.log("warning: in npm:sub-unsub, fsAccount.subscriptions.length = "+fsAccount.subscriptions.length+" for account: "+fsAccount.id+" exceeds limit:"+limit);
+    }
     const subids = fsAccount.subscriptions.slice(0,limit);
     if (subids && subids.length) {
       result.subid = await pLocate(
@@ -46,7 +49,7 @@ function subUnsub(server, options, next) {
           .then((response) => (response.data))
           .then((sub) => {
             if (sub.active){
-              const isCorrectProduct = (products === undefined) || (products.length === 0) || (
+              const isCorrectProduct = (products === undefined) || (products && !(products.length)) || (
                 (typeof(sub.product) === "string") && (products.includes(sub.product))
               );
               if (isCorrectProduct){
@@ -59,7 +62,7 @@ function subUnsub(server, options, next) {
         )
       );
     }
-    return result;  // { subid: 'fastspring-subscription-id', sub: { fastspring-subscription-object }}
+    return result;  // {} or { subid: 'fastspring-subscription-id', sub: { fastspring-subscription-object }}
   }
 
   async function getGoogleDriveAssociatedSubscription(req, reply) {
@@ -69,7 +72,11 @@ function subUnsub(server, options, next) {
         const email = await validEmail(req);
         const fsAccount = await fastspringAccount(email);
         req.fastspring.acct = fsAccount;
-        const result = await findActiveSubscription(fsAccount);
+        const result = await findActiveSubscription({
+          fsAccount,
+          limit: 10,
+          products: options.fsproduct
+        });
         Object.assign(req.fastspring, result); 
       } catch (e) {
         req.fastspring.error = e.toString();
