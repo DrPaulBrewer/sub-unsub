@@ -37,7 +37,7 @@ function subUnsub(server, options, next) {
   }){
     const result = {};
     if (limit && fsAccount && fsAccount.subscriptions && (fsAccount.subscriptions.length>limit)){
-      console.log("warning: in npm:sub-unsub, fsAccount.subscriptions.length = "+fsAccount.subscriptions.length+" for account: "+fsAccount.id+" exceeds limit:"+limit);
+      console.log("warning: in npm:sub-unsub, fsAccount.subscriptions.length = "+fsAccount.subscriptions.length+" for account: "+fsAccount.id+" exceeds scan limit:"+limit);
     }
     const subids = fsAccount.subscriptions.slice(0,limit);
     if (subids && subids.length) {
