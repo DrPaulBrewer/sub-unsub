@@ -1,6 +1,6 @@
 {
   "name": "sub-unsub",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "Hapi 16 plugin for checking active subscriptions for a specific product ordered by a user through fastspring.com",
   "main": "index.js",
   "scripts": {
