@@ -2,21 +2,20 @@
 
 const Boom = require('boom');
 const axios = require('axios');
-const pLocate = require('p-locate');
 
 function subUnsub(server, options, next) {
   if (!options.fsurl) throw Boom.badImplementation("options.fsurl missing in sub-unsub configuration");
   if (!Array.isArray(options.fsproduct)) throw Boom.badImplementation("options.fsproduct array missing in sub-unsub configuration");
-  
+
   async function validEmail(req){
     const info = await req.drive.x.aboutMe();
     const email = info.user.emailAddress.toLowerCase().trim();
     if ((!email) || !(email.length)) throw new Error("no email");
     if (email.indexOf('@') < 0) throw new Error("email missing @ symbol");
     if ((email.startsWith('@')) || (email.endsWith('@'))) throw new Error("invalid email: " + email);
-    return email;    
+    return email;
   }
-  
+
   async function fastspringAccount(email){
     const fsAccounts = await(
       axios
@@ -30,7 +29,7 @@ function subUnsub(server, options, next) {
     return fsAccount;
   }
 
-  async function findActiveSubscription({ 
+  async function findActiveSubscription({
     fsAccount,
     limit,
     products
@@ -41,26 +40,21 @@ function subUnsub(server, options, next) {
     }
     const subids = fsAccount.subscriptions.slice(0,limit);
     if (subids && subids.length) {
-      result.subid = await pLocate(
-        subids,
-        (id) => (
-          axios
-          .get(options.fsurl + "subscriptions/" + id)
-          .then((response) => (response.data))
-          .then((sub) => {
-            if (sub.active){
-              const isCorrectProduct = (products === undefined) || (products && !(products.length)) || (
-                (typeof(sub.product) === "string") && (products.includes(sub.product))
-              );
-              if (isCorrectProduct){
-                result.sub = sub;
-                return true;
-              }
-            }
-            return false;
-          })
-        )
+      const subdata = await(
+        axios
+        .get(options.fsurl+"subscriptions/"+subids.join(","))
+        .then((r)=>(r.data))
       );
+      const activeProductSubscriptions = (
+        subdata
+        .subscriptions
+        .filter((s)=>(s.active))
+        .filter((s)=>((products === undefined) || (products && !(products.length)) || (
+          (typeof(s.product) === "string") && (products.includes(s.product)))))
+        .sort((a,b)=>(-1*(+(a.changed)-(b.changed))))
+      );
+      result.sub = activeProductSubscriptions[0];
+      result.subid = result.sub.id;
     }
     return result;  // {} or { subid: 'fastspring-subscription-id', sub: { fastspring-subscription-object }}
   }
@@ -74,10 +68,10 @@ function subUnsub(server, options, next) {
         req.fastspring.acct = fsAccount;
         const result = await findActiveSubscription({
           fsAccount,
-          limit: 10,
+          limit: 20,
           products: options.fsproduct
         });
-        Object.assign(req.fastspring, result); 
+        Object.assign(req.fastspring, result);
       } catch (e) {
         req.fastspring.error = e.toString();
       }
@@ -95,7 +89,7 @@ function subUnsub(server, options, next) {
 
     nextdep(); // complete dependency registration
   });
-  
+
   next();  // complete extension registration
 }
 
