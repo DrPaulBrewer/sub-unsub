@@ -2,7 +2,7 @@
   "name": "sub-unsub",
   "version": "0.7.0",
   "description": "Hapi 16 plugin for checking active subscriptions for a specific product ordered by a user through fastspring.com",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -25,7 +25,6 @@
     "bugle": ">=2.0.0 <3"
   },
   "dependencies": {
-    "boom": "^6.0.0",
-    "p-locate": "^3.0.0"
+    "boom": "^6.0.0"
   }
 }

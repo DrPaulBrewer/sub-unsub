@@ -5,10 +5,9 @@ A Hapi plugin for sites with paid user subscriptions via fastspring
 ## Usage
 
 ### Compatibility
-
-* sub-unsub will eventually work with hapi 16
-* this software is untested (Dec. 2018) and probably doesn't work yet
-* so you really shouldnt be using this unless you intend to help out...
+* might work with hapi16
+* has not yet seen extensive use -- use at own risk
+* will need adaptations for hapi17
 
 ### Installation
 
@@ -19,12 +18,12 @@ A Hapi plugin for sites with paid user subscriptions via fastspring
 #### ./path/to/hapi/config/sub-unsub
 
     {
-		fsurl: "https://user:password@api.fastspring.com/",
-		fsproduct: ["bronze","silver","gold"]
+		    fsurl: "https://user:password@api.fastspring.com/",
+		    fsproduct: ["bronze","silver","gold"]
     }
 
 
-**Note: this will also require some set up in Fastspring before it will work**
+**Note: this assumes you have subscription products bronze, silver, gold set up in your Fastspring online store**
 
 ## Features
 * uses req.drive, set by npm:Bugle, to obtain user's email address as registered with Google Accounts
