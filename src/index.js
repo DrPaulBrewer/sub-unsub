@@ -60,6 +60,7 @@ async function fastspringDecoration({ drive, fsurl, fsproduct }){
   if (drive) {
     try {
       const email = await validEmail(drive);
+      result.email = email;
       const fsAccount = await fastspringAccount(email,fsurl);
       result.acct = fsAccount;
       const subProps = await findActiveProductSubscription({
